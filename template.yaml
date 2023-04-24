@@ -61,6 +61,34 @@ Resources:
         Sourcemap: true
         EntryPoints:
         - app.ts
+    
+  ConfirmUserApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/
+      Handler: app.confirmUserHandler
+      Runtime: nodejs18.x
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          REGION: us-east-1
+          USER_POOL_ID: us-east-1_d56yukuWX
+          CLIENT_ID: 7ckrjh0scgmvcfk9etc2i1fh67
+      Events:
+        SignUp:
+          Type: Api
+          Properties:
+            Path: /confirmuser
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
             
   SignInApi:
     Type: AWS::Serverless::Function
@@ -72,27 +100,79 @@ Resources:
         Variables:
           REGION: us-east-1
           USER_POOL_ID: us-east-1_d56yukuWX
+      Events:
+        SignUp:
+          Type: Api
+          Properties:
+            Path: /signin
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  
+  HelloWorldWithAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorldWithAuth:
+          Type: Api
+          Properties:
+            Path: /hellowithauth
+            Method: get
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - app.ts
+  
+  AppApi: 
+    DependsOn: UserPool
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: HelloWorldAPI
+      StageName: api
+      Cors: "'*'"
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: arn:aws:cognito-idp:us-east-1:503694153160:userpool/us-east-1_d56yukuWX
 
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
-    Properties:
-      Name:
-        Fn::Join:
-        - ''
-        - - ApplicationInsights-SAM-
-          - Ref: AWS::StackName
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
-    Properties:
-      ResourceGroupName:
-        Fn::Join:
-        - ''
-        - - ApplicationInsights-SAM-
-          - Ref: AWS::StackName
-      AutoConfigurationEnabled: 'true'
-    DependsOn: ApplicationResourceGroup
+  # ApplicationResourceGroup:
+  #   Type: AWS::ResourceGroups::Group
+  #   Properties:
+  #     Name:
+  #       Fn::Join:
+  #       - ''
+  #       - - ApplicationInsights-SAM-
+  #         - Ref: AWS::StackName
+  #     ResourceQuery:
+  #       Type: CLOUDFORMATION_STACK_1_0
+  # ApplicationInsightsMonitoring:
+  #   Type: AWS::ApplicationInsights::Application
+  #   Properties:
+  #     ResourceGroupName:
+  #       Fn::Join:
+  #       - ''
+  #       - - ApplicationInsights-SAM-
+  #         - Ref: AWS::StackName
+  #     AutoConfigurationEnabled: 'true'
+  #   DependsOn: ApplicationResourceGroup
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM

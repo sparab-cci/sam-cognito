@@ -1,5 +1,4 @@
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
-// import AWS from 'aws-sdk';
 
 const REGION = 'us-east-1';
 const USER_POOL_ID = 'us-east-1_d56yukuWX';
@@ -32,6 +31,22 @@ export const signUp = async (email: string, password: string): Promise<CognitoUs
 };
 
 
+export const confirmAuthCode = async (code: string): Promise<CognitoUser> => {
+    const user = { Username: 'parabsneha19@gmail.com', Pool: userPool };
+    return new Promise(async (resolve, reject) => {
+        const cognitoUser = new CognitoUser(user);
+        cognitoUser.confirmRegistration(code, true, function (err, result) {
+            if (err) {
+                console.log('err --> ', err);
+                reject(err);
+            }
+            console.log('confirmAuthCode() success -->', result);
+            resolve(result);
+        });
+    });
+};
+
+
 export const signIn = async (email: string, password: string): Promise<string> => {
     const authDetails = new AuthenticationDetails({
         Username: email,
@@ -46,9 +61,12 @@ export const signIn = async (email: string, password: string): Promise<string> =
     return new Promise((resolve, reject) => {
         cognitoUser.authenticateUser(authDetails, {
             onSuccess: (result) => {
+                console.log("result ", result);
+                console.log("result.getIdToken() >> ", result.getIdToken().getJwtToken());
                 resolve(result.getIdToken().getJwtToken());
             },
             onFailure: (err) => {
+                console.log("error ", err);
                 reject(err);
             },
         });

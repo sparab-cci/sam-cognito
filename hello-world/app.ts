@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import {signUp, signIn} from './cognito';
+import { signUp, signIn, confirmAuthCode } from './cognito';
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -31,7 +31,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
 export const signUpHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
-        const response = signUp('swella.gomindes.cci@gmail.com', '123456test');
+        const response = await signUp('parabsneha19@gmail.com', '123456test');
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -49,13 +49,23 @@ export const signUpHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     }
 };
 
+export const confirmUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    try {
+        const response = await confirmAuthCode('176812');
+        return { statusCode: 200, body: JSON.stringify({ message: response }) };
+    } catch (err) {
+        console.log('->> err ', err);
+        return { statusCode: 500, body: JSON.stringify({ message: 'some error happened' }) };
+    }
+};
+
 export const signInHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
-        const response = signIn('swella.gomindes.cci@gmail.com', '123456test');
+        const response = await signIn('parabsneha19@gmail.com', '123456test');
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'hello world',
+                message: response,
             }),
         };
     } catch (err) {
