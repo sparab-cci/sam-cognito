@@ -1,13 +1,15 @@
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-const REGION = 'us-east-1';
-const USER_POOL_ID = 'us-east-1_d56yukuWX';
-const CLIENT_ID = '7ckrjh0scgmvcfk9etc2i1fh67';
+const REGION = 'us-east-2';
+const USER_POOL_ID = 'us-east-2_MhH1DMpMv';
+const CLIENT_ID = '4h2arnmqcu4lheck42qdgvv661';
 
 const userPool = new CognitoUserPool({
     UserPoolId: USER_POOL_ID,
     ClientId: CLIENT_ID
 });
+
+
 
 export const signUp = async (email: string, password: string): Promise<CognitoUser> => {
     const attributeList = [
@@ -71,4 +73,8 @@ export const signIn = async (email: string, password: string): Promise<string> =
             },
         });
     });
+};
+
+export const getUserFromSession = async () => {
+    return userPool.getCurrentUser();
 };

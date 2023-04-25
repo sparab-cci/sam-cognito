@@ -44,9 +44,9 @@ Resources:
       - x86_64
       Environment:
         Variables:
-          REGION: us-east-1
-          USER_POOL_ID: us-east-1_d56yukuWX
-          CLIENT_ID: 7ckrjh0scgmvcfk9etc2i1fh67
+          REGION: us-east-2
+          USER_POOL_ID: us-east-2_MhH1DMpMv
+          CLIENT_ID: 4h2arnmqcu4lheck42qdgvv661
       Events:
         SignUp:
           Type: Api
@@ -72,9 +72,9 @@ Resources:
       - x86_64
       Environment:
         Variables:
-          REGION: us-east-1
-          USER_POOL_ID: us-east-1_d56yukuWX
-          CLIENT_ID: 7ckrjh0scgmvcfk9etc2i1fh67
+          REGION: us-east-2
+          USER_POOL_ID: us-east-2_MhH1DMpMv
+          CLIENT_ID: 4h2arnmqcu4lheck42qdgvv661
       Events:
         SignUp:
           Type: Api
@@ -98,8 +98,9 @@ Resources:
       Runtime: nodejs18.x
       Environment:
         Variables:
-          REGION: us-east-1
-          USER_POOL_ID: us-east-1_d56yukuWX
+          REGION: us-east-2
+          USER_POOL_ID: us-east-2_MhH1DMpMv
+          CLIENT_ID: 4h2arnmqcu4lheck42qdgvv661
       Events:
         SignUp:
           Type: Api
@@ -119,7 +120,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: hello-world/
-      Handler: app.lambdaHandler
+      Handler: app.authHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -131,7 +132,7 @@ Resources:
             Method: get
             RestApiId: !Ref AppApi
             Auth:
-              Authorizer: CognitoAuthorizer
+              Authorizer: CognitoAuthorizer  #Adding authorizer to the end point
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -148,10 +149,24 @@ Resources:
       Name: HelloWorldAPI
       StageName: api
       Cors: "'*'"
-      Auth:
+      Auth: #creating an authorizer to api
         Authorizers:
           CognitoAuthorizer:
-            UserPoolArn: arn:aws:cognito-idp:us-east-1:503694153160:userpool/us-east-1_d56yukuWX
+            UserPoolArn: arn:aws:cognito-idp:us-east-2:503694153160:userpool/us-east-2_MhH1DMpMv
+  
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyUserPoolDemo
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
 
   # ApplicationResourceGroup:
   #   Type: AWS::ResourceGroups::Group

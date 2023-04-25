@@ -17,10 +17,11 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-s3_prefix = "sam-cognito"
-region = "us-east-1"
+s3_prefix = "sam-cognito-ts"
+region = "us-east-2"
 profile = "certification"
 image_repositories = []
+stack_name = "sam-cognito-ts"
 
 [default.package.parameters]
 resolve_s3 = true

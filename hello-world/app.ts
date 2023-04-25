@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { signUp, signIn, confirmAuthCode } from './cognito';
+import { signUp, signIn, confirmAuthCode, getUserFromSession } from './cognito';
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -16,6 +16,26 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             statusCode: 200,
             body: JSON.stringify({
                 message: 'hello world',
+            }),
+        };
+    } catch (err) {
+        console.log(err);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: 'some error happened',
+            }),
+        };
+    }
+};
+
+export const authHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    try {
+        const response = getUserFromSession();
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: response,
             }),
         };
     } catch (err) {
@@ -51,7 +71,7 @@ export const signUpHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
 export const confirmUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
-        const response = await confirmAuthCode('176812');
+        const response = await confirmAuthCode('538612');
         return { statusCode: 200, body: JSON.stringify({ message: response }) };
     } catch (err) {
         console.log('->> err ', err);
